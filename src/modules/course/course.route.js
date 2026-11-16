@@ -16,3 +16,4 @@ router.put("/:id", verifyToken, verifyAdminRole, (req, res, next) => courseContr
 router.delete("/:id", verifyToken, verifyAdminRole, (req, res, next) => courseController.handleDeleteCourse(req, res, next));
 
 module.exports = router;
+

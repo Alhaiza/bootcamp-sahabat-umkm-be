@@ -16,3 +16,4 @@ router.put("/:id", verifyToken, verifyAdminRole, (req, res, next) => categoryCon
 router.delete("/:id", verifyToken, verifyAdminRole, (req, res, next) => categoryController.handleDeleteCategory(req, res, next));
 
 module.exports = router;
+

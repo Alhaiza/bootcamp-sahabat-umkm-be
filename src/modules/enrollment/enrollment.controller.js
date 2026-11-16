@@ -23,3 +23,4 @@ class EnrollmentController {
 }
 
 module.exports = new EnrollmentController();
+

@@ -32,3 +32,4 @@ apiRouter.use("/transaksi", transactionRoute);
 apiRouter.use("/daftar-kelas", enrollmentRoute);
 
 module.exports = apiRouter;
+

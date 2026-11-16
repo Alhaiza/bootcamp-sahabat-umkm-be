@@ -15,3 +15,4 @@ router.post("/", verifyToken, (req, res, next) => transactionController.handleCr
 router.put("/:id", verifyToken, verifyAdminRole, (req, res, next) => transactionController.handleVerifyTransaction(req, res, next));
 
 module.exports = router;
+

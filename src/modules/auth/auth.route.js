@@ -14,3 +14,4 @@ router.post("/login", (req, res, next) => authController.handleLogin(req, res, n
 router.post("/logout", verifyToken, (req, res, next) => authController.handleLogout(req, res, next));
 
 module.exports = router;
+

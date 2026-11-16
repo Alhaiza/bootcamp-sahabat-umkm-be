@@ -12,3 +12,4 @@ const router = express.Router();
 router.get("/", verifyToken, (req, res, next) => enrollmentController.handleGetEnrolledCourses(req, res, next));
 
 module.exports = router;
+

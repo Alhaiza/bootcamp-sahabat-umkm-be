@@ -18,3 +18,4 @@ router.get("/", verifyToken, (req, res, next) => userController.handleGetUserPro
 router.put("/", verifyToken, (req, res, next) => userController.handleUpdateUserProfile(req, res, next));
 
 module.exports = router;
+
