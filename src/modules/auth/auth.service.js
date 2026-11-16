@@ -5,7 +5,7 @@
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { User } = require("../../../models");
+const { User } = require("../../models");
 const { BadRequestError, UnauthorizedError } = require("../../errors/app.error");
 
 class AuthService {

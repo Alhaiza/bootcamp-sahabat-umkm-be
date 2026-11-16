@@ -4,7 +4,7 @@
  */
 
 const bcrypt = require("bcrypt");
-const { User } = require("../../../models");
+const { User } = require("../../models");
 const { NotFoundError, BadRequestError } = require("../../errors/app.error");
 const { USER_ROLES } = require("../../constants/app.constants");
 

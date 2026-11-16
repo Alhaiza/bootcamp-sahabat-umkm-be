@@ -3,7 +3,7 @@
  * @description Service layer untuk manajemen taksonomi kategori kelas.
  */
 
-const { Kategori } = require("../../../models");
+const { Kategori } = require("../../models");
 const { NotFoundError, BadRequestError } = require("../../errors/app.error");
 
 class CategoryService {

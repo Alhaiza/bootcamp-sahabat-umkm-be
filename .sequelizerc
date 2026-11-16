@@ -1,0 +1,11 @@
+const path = require("path");
+
+/**
+ * Konfigurasi path Sequelize CLI untuk mengarahkan ke struktur Clean Architecture di dalam direktori `src/`.
+ */
+module.exports = {
+  config: path.resolve("src", "config", "database.js"),
+  "models-path": path.resolve("src", "models"),
+  "seeders-path": path.resolve("src", "database", "seeders"),
+  "migrations-path": path.resolve("src", "database", "migrations"),
+};

@@ -3,7 +3,7 @@
  * @description Service layer untuk kelas yang berhasil didaftarkan peserta (My Classes).
  */
 
-const { Transaksi, Kelas } = require("../../../models");
+const { Transaksi, Kelas } = require("../../models");
 const { TRANSACTION_STATUS } = require("../../constants/app.constants");
 
 class EnrollmentService {

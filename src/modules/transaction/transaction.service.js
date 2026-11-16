@@ -3,7 +3,7 @@
  * @description Service layer untuk transaksi pemesanan dan aktivasi kelas.
  */
 
-const { Transaksi, Kelas } = require("../../../models");
+const { Transaksi, Kelas } = require("../../models");
 const { NotFoundError, BadRequestError } = require("../../errors/app.error");
 const { USER_ROLES, TRANSACTION_STATUS } = require("../../constants/app.constants");
 

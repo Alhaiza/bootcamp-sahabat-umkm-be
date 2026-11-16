@@ -3,7 +3,7 @@
  * @description Service layer untuk katalog modul kelas pembelajaran UMKM.
  */
 
-const { Kelas } = require("../../../models");
+const { Kelas } = require("../../models");
 const { NotFoundError, BadRequestError } = require("../../errors/app.error");
 
 class CourseService {
