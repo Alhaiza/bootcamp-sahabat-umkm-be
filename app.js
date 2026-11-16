@@ -8,40 +8,43 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const routes = require("./routes");
+// Validasi fail-early environment variables
+const { envConfig } = require("./src/config/env.config");
 const { chaosMiddleware } = require("./src/chaos/chaos.middleware");
 const { globalErrorHandler } = require("./src/middlewares/error.middleware");
+const apiRouter = require("./src/routes/api.router");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Middleware umum
+// Standard middlewares
 app.use(cors());
 app.use(express.json());
 
-// Injeksi Chaos Engineering Middleware (Hanya aktif bila CHAOS_ENABLED='true' dan pre-production)
+// Chaos Engineering Failure Injection Middleware
 app.use(chaosMiddleware);
 
-// Endpoint Healthcheck terisolasi
+// Dedicated Healthcheck Endpoint
 app.get("/health", (req, res) => {
     res.status(200).json({
         status: 200,
         statusService: "UP",
         uptimeSeconds: Math.floor(process.uptime()),
         timestamp: new Date().toISOString(),
+        chaosEnabled: envConfig.chaos.isEnabled,
     });
 });
 
-// Routing aplikasi utama
-app.use(routes);
+// Centralized API Router
+app.use(apiRouter);
 
-// Centralized Global Error Handler Middleware
+// Centralized Global Error Handler
 app.use(globalErrorHandler);
 
-app.listen(PORT, () => {
-    console.log(`Server Sahabat-UMKM Backend aktif pada http://localhost:${PORT}`);
-    if (process.env.CHAOS_ENABLED === "true") {
-        console.warn(`[CHAOS ENGINEERING ACTIVE] Mode pengujian resiliensi aktif di lingkungan ${process.env.NODE_ENV || "development"}`);
+// Start server
+app.listen(envConfig.port, () => {
+    console.log(`Server Sahabat-UMKM Backend aktif pada http://localhost:${envConfig.port}`);
+    if (envConfig.chaos.isEnabled) {
+        console.warn(`[CHAOS ENGINEERING ACTIVE] Mode pengujian resiliensi aktif di lingkungan ${envConfig.nodeEnv}`);
     }
 });
 

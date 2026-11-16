@@ -71,3 +71,4 @@ jobs:
           file: sahabat-umkm-be/docker/Dockerfile
           push: false
           tags: sahabat-umkm-be:latest
+
