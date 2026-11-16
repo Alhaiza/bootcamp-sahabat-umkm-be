@@ -1,113 +1,206 @@
 # Sahabat UMKM - Backend API
 
-RESTful API backend untuk platform pembelajaran daring (*e-learning / online course*) **Sahabat-UMKM**. Layanan ini mengelola data pengguna, kursus/kelas, kategori kelas UMKM, dan transaksi pendaftaran kelas.
+Enterprise-grade RESTful API service untuk platform edukasi daring (**e-learning / online course**) **Sahabat-UMKM**, dibangun untuk mendukung kapasitas literasi digital, manajemen usaha, dan pemasaran bagi para pelaku Usaha Mikro, Kecil, dan Menengah (UMKM).
 
 ---
 
-## 🚀 Tech Stack
+## 1. Title & Deskripsi Arsitektur
 
-- **Runtime & Framework**: [Node.js](https://nodejs.org/) & [Express.js](https://expressjs.com/)
-- **Database & ORM**: [MySQL](https://www.mysql.com/) & [Sequelize ORM](https://sequelize.org/)
-- **Authentication & Security**: JSON Web Token (`jsonwebtoken`), Password Hashing (`bcrypt`), CORS
-- **Database Tooling**: `sequelize-cli` (Migrations & Seeders)
+### Core Technology Stack
+- **Runtime Environment**: [Node.js](https://nodejs.org/) (LTS v18+ hingga modern v22+)
+- **HTTP Framework**: [Express.js](https://expressjs.com/) v4
+- **Database Engine**: [MySQL](https://www.mysql.com/) 8.0+
+- **Object Relational Mapping (ORM)**: [Sequelize](https://sequelize.org/) v6 dengan `sequelize-cli`
+- **Security & Tokenization**: [JSON Web Token (jsonwebtoken)](https://github.com/auth0/node-jsonwebtoken), [bcrypt](https://github.com/kelektiv/node.bcrypt.js) (Salt rounds = 10), CORS
+
+### Core Features
+- **Autentikasi & Otorisasi**: Registrasi, login, logout, dan verifikasi berbasis JSON Web Token dengan diferensiasi hak akses Admin (role: `1`) dan Peserta UMKM (role: `0`).
+- **Katalog Kursus (Kelas)**: CRUD data kursus, durasi belajar, rating, silabus materi video, thumbnail gambar, serta profil mentor pengajar.
+- **Taksonomi Kategori**: Pengelompokan spesialisasi materi (Keuangan, Pemasaran Digital, Legalitas, Manajemen Usaha, dsb.).
+- **Manajemen Transaksi & Hak Akses**: Sistem order pendaftaran kelas, status verifikasi lunas, dan aktivasi akses ruang belajar siswa.
+- **Manajemen Pengguna**: Monitoring dan pemeliharaan akun peserta oleh Administrator.
 
 ---
 
-## 📂 Struktur Direktori
+## 2. System Architecture & Data Flow
 
 ```text
-sahabat-umkm-be/
-├── config/             # Konfigurasi database Sequelize (menggunakan environment variables)
-├── controllers/        # Logika pemrosesan bisnis per modul
-├── middleware/         # Middleware autentikasi token JWT
-├── migrations/         # Skema database migration
-├── models/             # Sequelize data models
-├── routes/             # Routing endpoint Express
-├── seeders/            # Data dummy awal (user, kategori, kelas, transaksi)
-├── .env.example        # Template konfigurasi environment
-├── app.js              # Entry point Express server
-└── package.json        # Dependencies dan script
+                        ┌───────────────────────────────┐
+                        │      Client Application       │
+                        │   (React SPA / Mobile / Postman)│
+                        └───────────────┬───────────────┘
+                                        │ HTTP Requests (JSON + Bearer Token)
+                                        ▼
+                        ┌───────────────────────────────┐
+                        │       Express Router          │
+                        │       (backend/routes)        │
+                        └───────────────┬───────────────┘
+                                        │
+                         [verifyToken / verifyRole Middleware]
+                                        │ Validated req.payload
+                                        ▼
+                        ┌───────────────────────────────┐
+                        │      Express Controllers      │
+                        │     (Business Logic Layer)    │
+                        └───────────────┬───────────────┘
+                                        │
+                               [Sequelize Models]
+                                        │ SQL Execution
+                                        ▼
+                        ┌───────────────────────────────┐
+                        │         MySQL Database        │
+                        │  (Users, Kelas, Kategori, Trx)│
+                        └───────────────────────────────┘
 ```
+
+### Skema Relasi Database (ERD Singkat):
+- **User (1) ───< Transaksi (N)**: Satu user dapat memiliki banyak histori transaksi pendaftaran kelas.
+- **Kelas (1) ───< Transaksi (N)**: Satu kelas dapat didaftarkan di banyak transaksi.
+- **Kategori (1) ───< Kelas (N)**: Satu kategori menaungi banyak kelas pembelajaran.
 
 ---
 
-## 🛠️ Panduan Instalasi & Menjalankan Lokal
+## 3. Prasyarat & Dependensi
 
-### 1. Prasyarat
-- Node.js (versi 16 atau lebih baru)
-- MySQL Server yang sedang aktif
+Pastikan perangkat lokal Anda telah terpasang:
+- **Node.js**: Versi `18.x`, `20.x`, atau `22.x+` (NPM versi `9.x` atau lebih baru).
+- **MySQL Server**: Versi `8.0` atau database MariaDB kompatibel yang aktif berjalan di port `3306`.
+- **Git**: Untuk version control.
 
-### 2. Kloning Repositori & Instal Dependensi
+---
+
+## 4. Panduan Instalasi & Setup Lokal
+
+Ikuti langkah-langkah presisi berikut secara berurutan:
+
+### Langkah 1: Kloning Repositori
 ```bash
 git clone git@github.com-personal:Alhaiza/bootcamp-sahabat-umkm-be.git
 cd bootcamp-sahabat-umkm-be
+```
+
+### Langkah 2: Instalasi Dependensi
+```bash
 npm install
 ```
 
-### 3. Konfigurasi Environment Variable
-Salin file `.env.example` menjadi `.env` lalu sesuaikan kredensial database lokal Anda:
+### Langkah 3: Menyiapkan Database MySQL
+Buka MySQL CLI atau GUI (DBeaver / MySQL Workbench / phpMyAdmin), lalu buat database baru:
+```sql
+CREATE DATABASE sahabat_umkm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+### Langkah 4: Menyiapkan File Environment
+Salin file template `.env.example` menjadi `.env`:
 ```bash
 cp .env.example .env
 ```
+Sesuaikan nilai variabel pada file `.env` dengan kredensial database lokal Anda (lihat Bagian 5).
 
-Contoh konfigurasi di `.env`:
-```env
-PORT=3000
-DB_USERNAME=root
-DB_PASSWORD=your_mysql_password
-DB_DATABASE=sahabat_umkm
-DB_HOST=127.0.0.1
-DB_DIALECT=mysql
-JWT_SECRET=rahasia_jwt_super_aman
-```
-
-> **Catatan**: Buat database baru di MySQL sesuai nama `DB_DATABASE` (misal: `sahabat_umkm`).
-
-### 4. Menjalankan Database Migration & Seeder
-Gunakan `sequelize-cli` untuk membuat tabel dan mengisi data awal:
+### Langkah 5: Eksekusi Migrasi & Seeder Database
+Jalankan migrasi skema tabel dan data permulaan:
 ```bash
-# Menjalankan migrasi tabel
+# Membuat struktur tabel database
 npx sequelize-cli db:migrate
 
-# Mengisi data awal (seeders)
+# Mengisi data awal (kategori, akun demo, kelas, & transaksi contoh)
 npx sequelize-cli db:seed:all
 ```
 
-### 5. Menjalankan Server
-```bash
-# Mode development (dengan nodemon)
-npm run dev
+---
 
-# Mode production
+## 5. Konfigurasi Environment Variable
+
+File `.env` digunakan untuk konfigurasi runtime server. Jangan pernah melakukan commit file `.env` ke Git repository.
+
+| Variabel | Tipe | Contoh Default | Deskripsi Teknis |
+|---|---|---|---|
+| `PORT` | Integer | `3000` | Port listen server Express HTTP |
+| `DB_USERNAME` | String | `root` | Username autentikasi server MySQL |
+| `DB_PASSWORD` | String | *(kosong)* | Password pengguna MySQL |
+| `DB_DATABASE` | String | `sahabat_umkm` | Nama skema database yang digunakan |
+| `DB_HOST` | String | `127.0.0.1` | Hostname / IP address server MySQL |
+| `DB_DIALECT` | String | `mysql` | Driver dialect database Sequelize |
+| `JWT_SECRET` | String | `rahasia_jwt_super_aman` | Kunci simetris enkripsi penandatanganan JWT token |
+
+---
+
+## 6. Cara Menjalankan Aplikasi
+
+### Mode Development (Hot Reloading via Nodemon):
+```bash
+npm run dev
+```
+Server aktif dan memantau perubahan file pada `http://localhost:3000`.
+
+### Mode Production:
+```bash
 npm start
 ```
-Server akan aktif di `http://localhost:3000`.
 
 ---
 
-## 📌 Ringkasan Endpoint API
+## 7. Panduan Testing & Validasi API
 
-| Method | Endpoint | Deskripsi | Proteksi Token |
-|---|---|---|---|
-| `POST` | `/register` | Registrasi akun user baru | Publik |
-| `POST` | `/login` | Login user & generate JWT | Publik |
-| `POST` | `/logout` | Logout user | Publik |
-| `GET` | `/user/all` | Mendapatkan daftar seluruh user | Ya (Admin) |
-| `GET` | `/kategori` | Mendapatkan daftar kategori kelas | Ya |
-| `POST` | `/kategori` | Menambah kategori baru | Ya |
-| `PUT` | `/kategori/:id` | Memperbarui kategori | Ya |
-| `DELETE` | `/kategori/:id` | Menghapus kategori | Ya |
-| `GET` | `/kelas` | Mendapatkan daftar seluruh kelas | Ya |
-| `GET` | `/kelas/:id` | Mendapatkan detail kelas berdasarkan ID | Ya |
-| `POST` | `/kelas` | Menambahkan kelas baru | Ya |
-| `PUT` | `/kelas/:id` | Mengubah data kelas | Ya |
-| `DELETE` | `/kelas/:id` | Menghapus data kelas | Ya |
-| `GET` | `/transaksi` | Mendapatkan riwayat transaksi | Ya |
-| `POST` | `/transaksi` | Membuat pesanan/transaksi pendaftaran | Ya |
-| `GET` | `/daftar-kelas` | Menampilkan daftar kelas yang diambil user | Ya |
+Uji konektivitas dasar REST API menggunakan `curl` atau REST Client (Postman):
+
+### Healthcheck:
+```bash
+curl -X GET http://localhost:3000/
+```
+Respons:
+```json
+{
+  "status": 200,
+  "message": "Selamat Datang di api backend"
+}
+```
+
+### Otentikasi Registrasi:
+```bash
+curl -X POST http://localhost:3000/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nama": "UMKM Budi",
+    "email": "budi@example.com",
+    "password": "password123",
+    "konfirmasi_password": "password123"
+  }'
+```
+
+### Otentikasi Login:
+```bash
+curl -X POST http://localhost:3000/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "budi@example.com",
+    "password": "password123"
+  }'
+```
 
 ---
 
-## 🔒 Catatan Keamanan
-- File `.env` tidak boleh di-*commit* ke repositori Git.
-- Pastikan secret key pada `JWT_SECRET` memiliki entropi tinggi di lingkungan produksi.
+## 8. Struktur Direktori Proyek
+
+```text
+sahabat-umkm-be/
+├── config/
+│   └── config.js              # Factory konfigurasi koneksi Sequelize berbasis ENV
+├── controllers/
+│   ├── auth.controller.js     # Logika pendaftaran, login, dan logout
+│   ├── daftar_kelas.controller.js # Logika penarikan kelas yang berhasil dibeli peserta
+│   ├── kategori.controller.js # CRUD taksonomi kategori materi
+│   ├── kelas.controller.js    # CRUD data modul kursus dan detail mentor
+│   ├── transaksi.controller.js# Pembuatan pesanan & verifikasi status lunas transaksi
+│   └── user.controlller.js    # Manajemen profil dan listing data user
+├── middleware/
+│   ├── bycookie.js            # Ekstraksi token dari cookie HTTP
+│   └── token.js               # Validasi Bearer Token JWT & otorisasi role (Admin/User)
+├── migrations/                # Migration files untuk pembuatan tabel di MySQL
+├── models/                    # Sequelize Data Models dan asosiasi relasi tabel
+├── routes/                    # Definisi router Express modular
+├── seeders/                   # Seeder data permulaan pengujian
+├── .env.example               # Template environment variables
+├── app.js                     # Root bootstrapping Express server & middleware
+└── package.json               # Manifest dependensi & script runner
+```

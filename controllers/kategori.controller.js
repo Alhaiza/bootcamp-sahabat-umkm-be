@@ -1,15 +1,25 @@
 const { Kategori } = require("../models");
 
+/**
+ * Controller untuk mengambil seluruh daftar kategori kelas.
+ *
+ * @async
+ * @function getAllKategori
+ * @param {import('express').Request} req - Express Request object.
+ * @param {import('express').Response} res - Express Response object.
+ * @returns {Promise<import('express').Response>} JSON daftar seluruh kategori (HTTP 200).
+ */
 const getAllKategori = async (req, res) => {
     try {
         const dataKategori = await Kategori.findAll();
 
-        res.status(200).json({
+        return res.status(200).json({
             status: 200,
             message: "Data kategori",
             data: dataKategori,
         });
     } catch (error) {
+        console.error("Kesalahan getAllKategori:", error);
         return res.status(500).json({
             status: 500,
             message: "Kesalahan server internal",
@@ -17,6 +27,15 @@ const getAllKategori = async (req, res) => {
     }
 };
 
+/**
+ * Controller untuk mengambil detail kategori tunggal berdasarkan ID parameter.
+ *
+ * @async
+ * @function getKategoriById
+ * @param {import('express').Request} req - Express Request dengan req.params.id.
+ * @param {import('express').Response} res - Express Response object.
+ * @returns {Promise<import('express').Response>} JSON data kategori (HTTP 200) atau 400 jika tidak ditemukan.
+ */
 const getKategoriById = async (req, res) => {
     try {
         const dataKategori = await Kategori.findByPk(req.params.id);
@@ -27,12 +46,13 @@ const getKategoriById = async (req, res) => {
             });
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             status: 200,
             message: "Detail data kategori",
             data: dataKategori,
         });
     } catch (error) {
+        console.error("Kesalahan getKategoriById:", error);
         return res.status(500).json({
             status: 500,
             message: "Kesalahan server internal",
@@ -40,6 +60,15 @@ const getKategoriById = async (req, res) => {
     }
 };
 
+/**
+ * Controller untuk menambahkan kategori kelas baru.
+ *
+ * @async
+ * @function createKategori
+ * @param {import('express').Request} req - Express Request dengan req.body: { nama_kategori, deskripsi }.
+ * @param {import('express').Response} res - Express Response object.
+ * @returns {Promise<import('express').Response>} JSON kategori yang dibuat (HTTP 201) atau 400 jika field kosong.
+ */
 const createKategori = async (req, res) => {
     try {
         const { nama_kategori, deskripsi } = req.body;
@@ -51,12 +80,13 @@ const createKategori = async (req, res) => {
         }
 
         const dataKategori = await Kategori.create({ nama_kategori, deskripsi });
-        res.status(201).json({
+        return res.status(201).json({
             status: 201,
             message: "Kategori anda berhasil dibuat",
             data: dataKategori,
         });
     } catch (error) {
+        console.error("Kesalahan createKategori:", error);
         return res.status(500).json({
             status: 500,
             message: "Kesalahan server internal",
@@ -64,6 +94,15 @@ const createKategori = async (req, res) => {
     }
 };
 
+/**
+ * Controller untuk memperbarui informasi kategori berdasarkan ID parameter.
+ *
+ * @async
+ * @function updateKategori
+ * @param {import('express').Request} req - Express Request dengan req.params.id dan req.body: { nama_kategori, deskripsi }.
+ * @param {import('express').Response} res - Express Response object.
+ * @returns {Promise<import('express').Response>} JSON status berhasil (HTTP 200) atau 400 jika tidak ditemukan.
+ */
 const updateKategori = async (req, res) => {
     try {
         const { nama_kategori, deskripsi } = req.body;
@@ -90,11 +129,12 @@ const updateKategori = async (req, res) => {
                 },
             }
         );
-        res.status(200).json({
+        return res.status(200).json({
             status: 200,
             message: "Kategori anda berhasil diubah",
         });
     } catch (error) {
+        console.error("Kesalahan updateKategori:", error);
         return res.status(500).json({
             status: 500,
             message: "Kesalahan server internal",
@@ -102,6 +142,15 @@ const updateKategori = async (req, res) => {
     }
 };
 
+/**
+ * Controller untuk menghapus kategori kelas berdasarkan ID parameter.
+ *
+ * @async
+ * @function deleteKategori
+ * @param {import('express').Request} req - Express Request dengan req.params.id.
+ * @param {import('express').Response} res - Express Response object.
+ * @returns {Promise<import('express').Response>} JSON konfirmasi penghapusan (HTTP 200) atau 400 jika ID tidak valid.
+ */
 const deleteKategori = async (req, res) => {
     try {
         const dataKategori = await Kategori.findByPk(req.params.id);
@@ -113,11 +162,12 @@ const deleteKategori = async (req, res) => {
         }
 
         await Kategori.destroy({ where: { id: req.params.id } });
-        res.status(200).json({
+        return res.status(200).json({
             status: 200,
             message: "Kategori anda berhasil dihapus",
         });
     } catch (error) {
+        console.error("Kesalahan deleteKategori:", error);
         return res.status(500).json({
             status: 500,
             message: "Kesalahan server internal",
@@ -125,14 +175,24 @@ const deleteKategori = async (req, res) => {
     }
 };
 
+/**
+ * Controller untuk menghapus seluruh kategori kelas (bulk delete).
+ *
+ * @async
+ * @function deleteAllKategori
+ * @param {import('express').Request} req - Express Request object.
+ * @param {import('express').Response} res - Express Response object.
+ * @returns {Promise<import('express').Response>} JSON status konfirmasi (HTTP 200).
+ */
 const deleteAllKategori = async (req, res) => {
     try {
-        await Kategori.destroy();
-        res.status(200).json({
+        await Kategori.destroy({ truncate: true });
+        return res.status(200).json({
             status: 200,
             message: "Kategori anda berhasil dihapus",
         });
     } catch (error) {
+        console.error("Kesalahan deleteAllKategori:", error);
         return res.status(500).json({
             status: 500,
             message: "Kesalahan server internal",

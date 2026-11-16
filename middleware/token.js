@@ -1,5 +1,16 @@
 const jwt = require("jsonwebtoken");
 
+/**
+ * Middleware untuk memverifikasi keabsahan JSON Web Token (JWT) pada header Authorization.
+ * Format header yang diterima: `Bearer <token>`.
+ * Menyimpan decoded payload ke `req.payload`.
+ *
+ * @function verifyToken
+ * @param {import('express').Request} req - Express Request object.
+ * @param {import('express').Response} res - Express Response object.
+ * @param {import('express').NextFunction} next - Express Next function.
+ * @returns {void|import('express').Response} Melanjutkan ke middleware berikutnya atau mengembalikan 401/500 jika tidak valid.
+ */
 const verifyToken = (req, res, next) => {
     const header = req.headers.authorization;
 
@@ -45,6 +56,16 @@ const verifyToken = (req, res, next) => {
     }
 };
 
+/**
+ * Middleware otorisasi untuk membatasi akses hanya kepada Administrator (role: 1).
+ * Harus dipanggil setelah `verifyToken`.
+ *
+ * @function verifyRoleAdmin
+ * @param {import('express').Request} req - Express Request object dengan req.payload.
+ * @param {import('express').Response} res - Express Response object.
+ * @param {import('express').NextFunction} next - Express Next function.
+ * @returns {void|import('express').Response} Lanjut jika admin (1), atau respon 401 jika bukan admin.
+ */
 const verifyRoleAdmin = (req, res, next) => {
     const { role } = req.payload;
     if (role == 1) {
@@ -57,6 +78,16 @@ const verifyRoleAdmin = (req, res, next) => {
     }
 };
 
+/**
+ * Middleware otorisasi untuk membatasi akses hanya kepada Peserta Kursus (role: 0).
+ * Harus dipanggil setelah `verifyToken`.
+ *
+ * @function verifyRoleUser
+ * @param {import('express').Request} req - Express Request object dengan req.payload.
+ * @param {import('express').Response} res - Express Response object.
+ * @param {import('express').NextFunction} next - Express Next function.
+ * @returns {void|import('express').Response} Lanjut jika user biasa (0), atau respon 401 jika bukan.
+ */
 const verifyRoleUser = (req, res, next) => {
     const { role } = req.payload;
     if (role == 0) {
