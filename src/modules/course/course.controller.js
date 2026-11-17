@@ -23,7 +23,10 @@ class CourseController {
 
     async handleGetCourseById(req, res, next) {
         try {
-            const course = await courseService.findCourseById(req.params.id);
+            const userId = req.payload ? req.payload.id : null;
+            const userRole = req.payload ? req.payload.role : null;
+
+            const course = await courseService.findCourseById(req.params.id, userId, userRole);
             return res.status(HTTP_STATUS.OK).json({
                 status: HTTP_STATUS.OK,
                 success: true,
@@ -77,4 +80,3 @@ class CourseController {
 }
 
 module.exports = new CourseController();
-
